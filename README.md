@@ -1,13 +1,13 @@
 <div align="center">
-  <h1>MoleCleaner Windows</h1>
+  <h1>MoleCleaner</h1>
   <p><em>Deep clean and optimize your Windows PC.</em></p>
 </div>
 
 <p align="center">
-  <a href="https://github.com/PushDream/MoleCleaner-Windows/stargazers"><img src="https://img.shields.io/github/stars/PushDream/MoleCleaner-Windows?style=flat-square" alt="Stars"></a>
-  <a href="https://github.com/PushDream/MoleCleaner-Windows/releases"><img src="https://img.shields.io/github/v/tag/PushDream/MoleCleaner-Windows?label=version&style=flat-square" alt="Version"></a>
+  <a href="https://github.com/PushDream/MoleCleaner/stargazers"><img src="https://img.shields.io/github/stars/PushDream/MoleCleaner?style=flat-square" alt="Stars"></a>
+  <a href="https://github.com/PushDream/MoleCleaner/releases"><img src="https://img.shields.io/github/v/tag/PushDream/MoleCleaner?label=version&style=flat-square" alt="Version"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="License"></a>
-  <a href="https://github.com/PushDream/MoleCleaner-Windows/commits"><img src="https://img.shields.io/github/commit-activity/m/PushDream/MoleCleaner-Windows?style=flat-square" alt="Commits"></a>
+  <a href="https://github.com/PushDream/MoleCleaner/commits"><img src="https://img.shields.io/github/commit-activity/m/PushDream/MoleCleaner?style=flat-square" alt="Commits"></a>
 </p>
 
 ## Features
@@ -49,9 +49,10 @@ mole purge -DryRun        # Find project artifacts
 
 ## Attribution
 
-MoleCleaner Windows is based on the original macOS project by Tw93:
+MoleCleaner is based on the original macOS project by Tw93:
 - https://github.com/tw93/mole
 
 ## License
 
 MIT License - see LICENSE for details.
+
