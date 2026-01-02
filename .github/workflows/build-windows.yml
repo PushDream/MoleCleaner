@@ -1,0 +1,107 @@
+name: Build Windows
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.24'
+
+    - name: Get version
+      id: get_version
+      shell: pwsh
+      run: |
+        if ("${{ github.ref }}" -match "refs/tags/(.*)") {
+          $version = $matches[1]
+        } else {
+          $version = "dev"
+        }
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        echo "Version: $version"
+
+    - name: Build status monitor
+      shell: pwsh
+      run: |
+        .\scripts\build-status-windows.ps1
+      env:
+        VERSION: ${{ steps.get_version.outputs.VERSION }}
+
+    - name: Test status monitor
+      shell: pwsh
+      run: |
+        if (Test-Path "bin\status-go.exe") {
+          Write-Host "✓ status-go.exe built successfully"
+          $size = (Get-Item "bin\status-go.exe").Length / 1MB
+          Write-Host "  Size: $([math]::Round($size, 2)) MB"
+        } else {
+          Write-Error "Build failed: status-go.exe not found"
+          exit 1
+        }
+
+    - name: Package Windows release
+      if: startsWith(github.ref, 'refs/tags/')
+      shell: pwsh
+      run: |
+        $version = "${{ steps.get_version.outputs.VERSION }}"
+        $releaseName = "mole-windows-$version"
+
+        # Create release directory
+        New-Item -ItemType Directory -Path $releaseName -Force
+
+        # Copy files
+        Copy-Item mole.ps1 $releaseName\
+        Copy-Item install-windows.ps1 $releaseName\
+        Copy-Item -Path bin -Destination $releaseName\ -Recurse
+        Copy-Item -Path scripts -Destination $releaseName\ -Recurse
+        Copy-Item WINDOWS.md $releaseName\
+        Copy-Item QUICKSTART-WINDOWS.md $releaseName\
+        Copy-Item README.md $releaseName\
+        Copy-Item LICENSE $releaseName\ -ErrorAction SilentlyContinue
+
+        # Create ZIP
+        Compress-Archive -Path $releaseName -DestinationPath "$releaseName.zip"
+
+        Write-Host "Created release package: $releaseName.zip"
+
+    - name: Upload artifact
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/upload-artifact@v3
+      with:
+        name: mole-windows-${{ steps.get_version.outputs.VERSION }}
+        path: mole-windows-${{ steps.get_version.outputs.VERSION }}.zip
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: mole-windows-${{ steps.get_version.outputs.VERSION }}.zip
+        body: |
+          ## Mole for Windows ${{ steps.get_version.outputs.VERSION }}
+
+          ### Installation
+          1. Download and extract the ZIP file
+          2. Run `install-windows.ps1` as Administrator
+          3. Restart your terminal
+          4. Run `mole help`
+
+          ### Features
+          - System cleanup
+          - Application uninstaller
+          - Real-time system monitoring
+
+          See [WINDOWS.md](https://github.com/tw93/mole/blob/main/WINDOWS.md) for detailed instructions.
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
